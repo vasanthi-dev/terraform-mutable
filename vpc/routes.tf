@@ -24,8 +24,9 @@ resource "aws_route_table" "route" {
   }
 }
 resource "aws_route" "route-from-default-vpc" {
-  route_table_id            = aws_route_table.route.id
-  destination_cidr_block    = var.DEFAULT_VPC_CIDR
+  count                     =length(local.association-list)
+  route_table_id            = tomap(element(local.association-list,count.index ))["route_table"]
+  destination_cidr_block    = tomap(element(local.association-list,count.index ))["cidr"]
   vpc_peering_connection_id = aws_vpc_peering_connection.peer.id
 }
 
