@@ -25,3 +25,7 @@ output "PUBLIC_SUBNET_CIDR" {
 output "DEFAULT_VPC_CIDR" {
   value = var.DEFAULT_VPC_ID
 }
+
+output "INTERNAL_HOSTED_ZONE_ID" {
+  value = var.INTERNAL_HOSTED_ZONE_ID
+}

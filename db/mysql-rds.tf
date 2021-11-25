@@ -24,3 +24,11 @@ resource "aws_db_subnet_group" "subnet-group" {
     Name = "mysqldb-subnet-group-${var.ENV}"
   }
 }
+
+resource "aws_route53_record" "mysql" {
+  zone_id = data.terraform_remote_state.vpc.outputs.INTERNAL_HOSTED_ZONE_ID
+  name    = "mysql-${var.ENV}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = [aws_db_instance.mysql.endpoint]
+}
