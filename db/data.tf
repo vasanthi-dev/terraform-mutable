@@ -7,3 +7,11 @@ data "terraform_remote_state" "vpc" {
     region = "us-east-1"
   }
 }
+
+resource "aws_secretsmanager_secret" "secrets" {
+  name = var.ENV
+}
+
+output "sec" {
+  value = aws_secretsmanager_secret.secrets
+}
