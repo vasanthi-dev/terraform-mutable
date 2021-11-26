@@ -1,7 +1,13 @@
 locals {
   rds_user = jsondecode(data.aws_secretsmanager_secret_version.secrets-version.secret_string)["RDS_MYSQL_USER"]
   rds_pass = jsondecode(data.aws_secretsmanager_secret_version.secrets-version.secret_string)["RDS_MYSQL_PASS"]
+  DEFAULT_VPC_CIDR = split(",", data.terraform_remote_state.vpc.outputs.DEFAULT_VPC_CIDR )
+  ALL_CIDR         = concat(data.terraform_remote_state.vpc.outputs.ALL_VPC_CIDR, local.DEFAULT_VPC_CIDR)
 }
+output "allcidr" {
+  value = local.ALL_CIDR
+}
+
 resource "aws_db_instance" "mysql" {
   allocated_storage    = 10
   identifier           = "mysql-${var.ENV}"
@@ -13,57 +19,46 @@ resource "aws_db_instance" "mysql" {
   password             = local.rds_pass
   parameter_group_name = aws_db_parameter_group.pg.name
   skip_final_snapshot  = true
-  vpc_security_group_ids = [aws_security_group.mysql.id]
+#  vpc_security_group_ids = [aws_security_group.mysql.id]
 }
 
-#resource "aws_db_security_group" "mysql" {
-#  name = "mysql-${var.ENV}"
+#resource "aws_security_group" "mysql" {
+#  name        = "mysql-${var.ENV}"
+#  description = "mysql-${var.ENV}"
 #
-#  dynamic "ingress" {
-#    for_each = local.ALL_CIDR
-#    content {
-#      cidr = ingress.value
+#
+#  ingress = [
+#    {
+#      description      = "MYSQL"
+#      from_port        = 3306
+#      to_port          = 3306
+#      protocol         = "tcp"
+#      cidr_blocks      = local.ALL_CIDR
+#      ipv6_cidr_blocks = []
+#      prefix_list_ids  = []
+#      security_groups  = []
+#      self             = false
 #    }
+#  ]
+#
+#  egress = [
+#    {
+#      description      = "egress"
+#      from_port        = 0
+#      to_port          = 0
+#      protocol         = "-1"
+#      cidr_blocks      = ["0.0.0.0/0"]
+#      ipv6_cidr_blocks = ["::/0"]
+#      prefix_list_ids  = []
+#      security_groups  = []
+#      self             = false
+#    }
+#  ]
+#
+#  tags = {
+#    Name = "mysql-${var.ENV}"
 #  }
 #}
-
-resource "aws_security_group" "mysql" {
-  name        = "mysql-${var.ENV}"
-  description = "mysql-${var.ENV}"
-
-
-  ingress = [
-    {
-      description      = "MYSQL"
-      from_port        = 3306
-      to_port          = 3306
-      protocol         = "tcp"
-      cidr_blocks      = local.ALL_CIDR
-      ipv6_cidr_blocks = []
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  ]
-
-  egress = [
-    {
-      description      = "egress"
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  ]
-
-  tags = {
-    Name = "mysql-${var.ENV}"
-  }
-}
 
 resource "aws_db_parameter_group" "pg" {
   name   = "mysql-${var.ENV}-pg"
