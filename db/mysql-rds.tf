@@ -13,7 +13,16 @@ resource "aws_db_instance" "mysql" {
   password             = rds_pass
   parameter_group_name = aws_db_parameter_group.pg.name
   skip_final_snapshot  = true
+  vpc_security_group_ids = []
 }
+
+#resource "aws_db_security_group" "mysql" {
+#  name = "mysql-${var.ENV}"
+#
+#  ingress {
+#    cidr = data.terraform_remote_state.vpc.outputs.ALL_VPC_CIDR
+#  }
+#}
 
 resource "aws_db_parameter_group" "pg" {
   name   = "mysql-${var.ENV}-pg"
@@ -38,6 +47,7 @@ resource "aws_route53_record" "mysql" {
 }
 
 resource "null_resource" "schema-apply" {
+  depends_on = [aws_route53_record.mysql]
   provisioner "local-exec" {
     command=<<EOF
 sudo yum install mariadb -y

@@ -29,3 +29,7 @@ output "DEFAULT_VPC_CIDR" {
 output "INTERNAL_HOSTED_ZONE_ID" {
   value = var.INTERNAL_HOSTED_ZONE_ID
 }
+
+output "ALL_VPC_CIDR" {
+  value = local.ALL_VPC_CIDR
+}
