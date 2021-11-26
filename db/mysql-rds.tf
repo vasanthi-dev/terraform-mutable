@@ -26,6 +26,7 @@ resource "aws_db_instance" "mysql" {
 resource "aws_security_group" "mysql" {
   name        = "mysql-${var.ENV}"
   description = "mysql-${var.ENV}"
+  vpc_id      = data.terraform_remote_state.vpc.outputs.VPC_ID
 
   ingress = [
     {
