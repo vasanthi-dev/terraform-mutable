@@ -1,6 +1,6 @@
 locals {
-#  rds_user = jsondecode(data.aws_secretsmanager_secret_version.secrets-version.secret_string)["RDS_MYSQL_USER"]
-#  rds_pass = jsondecode(data.aws_secretsmanager_secret_version.secrets-version.secret_string)["RDS_MYSQL_PASS"]
+  rds_user = jsondecode(data.aws_secretsmanager_secret_version.secrets-version.secret_string)["RDS_MYSQL_USER"]
+  rds_pass = jsondecode(data.aws_secretsmanager_secret_version.secrets-version.secret_string)["RDS_MYSQL_PASS"]
   DEFAULT_VPC_CIDR = split(",", data.terraform_remote_state.vpc.outputs.DEFAULT_VPC_CIDR )
   ALL_CIDR = concat(data.terraform_remote_state.vpc.outputs.ALL_VPC_CIDR, local.DEFAULT_VPC_CIDR)
 }
@@ -11,8 +11,8 @@ resource "aws_db_instance" "mysql" {
   engine_version       = "5.7"
   instance_class       = "db.t3.micro"
   name                 = "dummy"
-  username             = rds_user
-  password             = rds_pass
+  username             = local.rds_user
+  password             = local.rds_pass
   parameter_group_name = aws_db_parameter_group.pg.name
   skip_final_snapshot  = true
   vpc_security_group_ids = [aws_security_group.mysql.id]
@@ -88,16 +88,16 @@ resource "aws_route53_record" "mysql" {
   ttl     = "300"
   records = [aws_db_instance.mysql.endpoint]
 }
-#
-#resource "null_resource" "schema-apply" {
-#  depends_on = [aws_route53_record.mysql]
-#  provisioner "local-exec" {
-#    command=<<EOF
-#sudo yum install mariadb -y
-#curl -s -L -o /tmp/mysql.zip "https://github.com/roboshop-devops-project/mysql/archive/main.zip"
-#cd /tmp
-#unzip -o /tmp/mysql.zip
-#mysql -h${aws_db_instance.mysql.address} -u${local.rds_user} -p${local.rds_pass} <mysql-main/shipping.sql
-#EOF
-#  }
-#}
+
+resource "null_resource" "schema-apply" {
+  depends_on = [aws_route53_record.mysql]
+  provisioner "local-exec" {
+    command=<<EOF
+sudo yum install mariadb -y
+curl -s -L -o /tmp/mysql.zip "https://github.com/roboshop-devops-project/mysql/archive/main.zip"
+cd /tmp
+unzip -o /tmp/mysql.zip
+mysql -h${aws_db_instance.mysql.address} -u${local.rds_user} -p${local.rds_pass} <mysql-main/shipping.sql
+EOF
+  }
+}
