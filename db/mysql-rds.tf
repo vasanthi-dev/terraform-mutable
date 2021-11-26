@@ -20,12 +20,12 @@ resource "aws_db_instance" "mysql" {
   parameter_group_name = aws_db_parameter_group.pg.name
   skip_final_snapshot  = true
   vpc_security_group_ids = [aws_security_group.mysql.id]
+  db_subnet_group_name   = aws_db_subnet_group.subnet-group.name
 }
 
 resource "aws_security_group" "mysql" {
   name        = "mysql-${var.ENV}"
   description = "mysql-${var.ENV}"
-
 
   ingress = [
     {
@@ -82,15 +82,15 @@ resource "aws_route53_record" "mysql" {
   records = [aws_db_instance.mysql.endpoint]
 }
 
-resource "null_resource" "schema-apply" {
-  depends_on = [aws_route53_record.mysql]
-  provisioner "local-exec" {
-    command=<<EOF
-sudo yum install mariadb -y
-curl -s -L -o /tmp/mysql.zip "https://github.com/roboshop-devops-project/mysql/archive/main.zip"
-cd /tmp
-unzip -o /tmp/mysql.zip
-mysql -h${aws_db_instance.mysql.address} -u${local.rds_user} -p${local.rds_pass} <mysql-main/shipping.sql
-EOF
-  }
-}
+#resource "null_resource" "schema-apply" {
+#  depends_on = [aws_route53_record.mysql]
+#  provisioner "local-exec" {
+#    command=<<EOF
+#sudo yum install mariadb -y
+#curl -s -L -o /tmp/mysql.zip "https://github.com/roboshop-devops-project/mysql/archive/main.zip"
+#cd /tmp
+#unzip -o /tmp/mysql.zip
+#mysql -h${aws_db_instance.mysql.address} -u${local.rds_user} -p${local.rds_pass} <mysql-main/shipping.sql
+#EOF
+#  }
+#}
