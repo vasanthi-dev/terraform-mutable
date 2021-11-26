@@ -19,46 +19,46 @@ resource "aws_db_instance" "mysql" {
   password             = local.rds_pass
   parameter_group_name = aws_db_parameter_group.pg.name
   skip_final_snapshot  = true
-#  vpc_security_group_ids = [aws_security_group.mysql.id]
+  vpc_security_group_ids = [aws_security_group.mysql.id]
 }
 
-#resource "aws_security_group" "mysql" {
-#  name        = "mysql-${var.ENV}"
-#  description = "mysql-${var.ENV}"
-#
-#
-#  ingress = [
-#    {
-#      description      = "MYSQL"
-#      from_port        = 3306
-#      to_port          = 3306
-#      protocol         = "tcp"
-#      cidr_blocks      = local.ALL_CIDR
-#      ipv6_cidr_blocks = []
-#      prefix_list_ids  = []
-#      security_groups  = []
-#      self             = false
-#    }
-#  ]
-#
-#  egress = [
-#    {
-#      description      = "egress"
-#      from_port        = 0
-#      to_port          = 0
-#      protocol         = "-1"
-#      cidr_blocks      = ["0.0.0.0/0"]
-#      ipv6_cidr_blocks = ["::/0"]
-#      prefix_list_ids  = []
-#      security_groups  = []
-#      self             = false
-#    }
-#  ]
-#
-#  tags = {
-#    Name = "mysql-${var.ENV}"
-#  }
-#}
+resource "aws_security_group" "mysql" {
+  name        = "mysql-${var.ENV}"
+  description = "mysql-${var.ENV}"
+
+
+  ingress = [
+    {
+      description      = "MYSQL"
+      from_port        = 3306
+      to_port          = 3306
+      protocol         = "tcp"
+      cidr_blocks      = local.ALL_CIDR
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
+    }
+  ]
+
+  egress = [
+    {
+      description      = "egress"
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
+    }
+  ]
+
+  tags = {
+    Name = "mysql-${var.ENV}"
+  }
+}
 
 resource "aws_db_parameter_group" "pg" {
   name   = "mysql-${var.ENV}-pg"
