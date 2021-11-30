@@ -80,7 +80,7 @@ resource "aws_route53_record" "mysql" {
   name    = "mysql-${var.ENV}"
   type    = "CNAME"
   ttl     = "300"
-  records = [aws_db_instance.mysql.endpoint]
+  records = [aws_db_instance.mysql.address]
 }
 
 resource "null_resource" "schema-apply" {
@@ -95,3 +95,5 @@ mysql -h${aws_db_instance.mysql.address} -u${local.rds_user} -p${local.rds_pass}
 EOF
   }
 }
+
+
