@@ -74,7 +74,7 @@ resource "aws_route53_record" "mongodb" {
 
 resource "null_resource" "mongodb-setup" {
   provisioner "remote-exec" {
-    connection = {
+    connection {
       host     = aws_spot_instance_request.mongodb.private_ip
       user     = local.ssh_user
       password = local.ssh_pass
