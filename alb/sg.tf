@@ -1,7 +1,7 @@
 resource "aws_security_group" "public-alb" {
   name        = "roboshop-public-alb-${var.ENV}"
   description = "roboshop-public-alb-${var.ENV}"
-#  vpc_id      = da
+  vpc_id      = data.terraform_remote_state.vpc.outputs.VPC_ID
 
   ingress = [
     {
