@@ -58,6 +58,12 @@ resource "aws_spot_instance_request" "mongodb" {
   }
 }
 
+resource "aws_ec2_tag" "mongodb" {
+  resource_id = aws_spot_instance_request.mongodb.spot_instance_id
+  key         = "Name"
+  value       = "mongodb-${var.ENV}"
+}
+
 resource "aws_route53_record" "mongodb" {
   zone_id = data.terraform_remote_state.vpc.outputs.INTERNAL_HOSTED_ZONE_ID
   name    = "mongodb-${var.ENV}"
