@@ -52,6 +52,7 @@ resource "aws_spot_instance_request" "mongodb" {
   instance_type = var.MONGODB_INSTANCE_TYPE
   vpc_security_group_ids = [ aws_security_group.mongodb.id ]
   wait_for_fulfillment = true
+  subnet_id = data.terraform_remote_state.vpc.outputs.PRIVATE_SUBNETS_IDS[0]
   tags = {
     Name = "mongodb-${var.ENV}"
   }
