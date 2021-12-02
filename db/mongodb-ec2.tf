@@ -14,6 +14,17 @@ resource "aws_security_group" "mongodb" {
       prefix_list_ids  = []
       security_groups  = []
       self             = false
+    },
+    {
+      description      = "SSH"
+      from_port        = 22
+      to_port          = 22
+      protocol         = "tcp"
+      cidr_blocks      = local.ALL_CIDR
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      security_groups  = []
+      self             = false
     }
   ]
 
@@ -56,7 +67,7 @@ resource "aws_route53_record" "mongodb" {
 
 resource "null_resource" "mongodb-setup" {
   provisioner "remote-exec" {
-    connection {
+    connection = {
       host     = aws_spot_instance_request.mongodb.private_ip
       user     = local.ssh_user
       password = local.ssh_pass
