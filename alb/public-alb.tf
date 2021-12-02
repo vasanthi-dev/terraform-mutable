@@ -4,7 +4,7 @@ resource "aws_lb" "public" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.public-alb.id]
   subnets            = data.terraform_remote_state.vpc.outputs.PUBLIC_SUBNETS_IDS
-  enable_deletion_protection = true
+  enable_deletion_protection = false
 
   tags = {
     Environment = "roboshop-public-${var.ENV}"
